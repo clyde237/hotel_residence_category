@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hotel_room_category_user,hotel.room.category.user,model_hotel_room_category,hotel_management_system.hotel_reception_group,1,1,1,0
+access_hotel_room_category_manager,hotel.room.category.manager,model_hotel_room_category,hotel_management_system.hotel_owner_group,1,1,1,1
+access_hotel_room_category_public,hotel.room.category.public,model_hotel_room_category,,1,0,0,0

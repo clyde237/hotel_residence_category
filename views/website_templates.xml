@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Page des catégories d'appartements -->
+    <template id="residence_categories_page" name="Residence Categories">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure">
+                <div class="container mt-5 mb-5">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <h1 class="text-center mb-4">Nos Appartements</h1>
+                            <p class="text-center text-muted mb-5">
+                                Découvrez nos différentes catégories d'appartements disponibles
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <t t-foreach="categories" t-as="category">
+                            <div class="col-lg-6 col-md-6 mb-4">
+                                <div class="card h-100 shadow-sm">
+                                    <t t-if="category.image">
+                                        <img class="card-img-top" t-att-src="image_data_uri(category.image)" alt="Category Image" style="height: 250px; object-fit: cover;"/>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 250px;">
+                                            <i class="fa fa-building fa-5x text-white"/>
+                                        </div>
+                                    </t>
+
+                                    <div class="card-body">
+                                        <h3 class="card-title">
+                                            <t t-esc="category.name"/>
+                                        </h3>
+
+                                        <div class="mb-3">
+                                            <span class="badge badge-primary mr-2">
+                                                <i class="fa fa-bed"/> <t t-esc="category.bedroom_count"/> Chambres
+                                            </span>
+                                            <span t-if="category.is_furnished" class="badge badge-success">
+                                                <i class="fa fa-check"/> Meublé
+                                            </span>
+                                            <span t-else="" class="badge badge-info">
+                                                <i class="fa fa-cube"/> Non-meublé
+                                            </span>
+                                        </div>
+
+                                        <p class="card-text text-muted">
+                                            <t t-esc="category.description"/>
+                                        </p>
+
+                                        <div class="alert alert-info mb-3">
+                                            <strong>
+                                                <i class="fa fa-info-circle"/> Disponibilité :
+                                                <span class="text-success">
+                                                    <t t-esc="category.available_rooms"/>/<t t-esc="category.total_rooms"/>
+                                                </span>
+                                            </strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="card-footer bg-transparent">
+                                        <a t-att-href="'/residence/category/%s' % category.id" class="btn btn-primary btn-block">
+                                            <i class="fa fa-eye"/> Voir les appartements disponibles
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>
