@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- ========== PAS DE VUE HÉRITÉE - CONFIGURATION MANUELLE ========== -->
+    <!-- Les champs bedroom_count et is_furnished existent déjà sur product.product -->
+    <!-- Ils seront visibles en mode développeur -->
+
     <!-- Vue Liste des produits (pour utilisation dans room_ids) -->
     <record id="view_product_product_tree_room_category" model="ir.ui.view">
         <field name="name">product.product.tree.room.category</field>
@@ -9,6 +13,8 @@
         <field name="arch" type="xml">
             <list string="Appartements">
                 <field name="name"/>
+                <field name="bedroom_count" optional="show"/>
+                <field name="is_furnished" widget="boolean_toggle" optional="show"/>
                 <field name="list_price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                 <field name="max_adult" optional="show"/>
                 <field name="max_child" optional="show"/>
@@ -77,8 +83,46 @@
                             <field name="description" placeholder="Description de la catégorie pour le site web..."/>
                         </page>
                         <page string="Appartements" name="rooms">
+                            <!-- Sélection rapide en tags -->
+                            <group string="Ajouter des appartements">
+                                <field name="room_ids"
+                                       widget="many2many_tags"
+                                       options="{'no_create': True, 'no_quick_create': True}"
+                                       domain="[('is_room_type', '=', True)]"
+                                       placeholder="Cliquez pour sélectionner des appartements..."
+                                       nolabel="1"/>
+                            </group>
+
+                            <!-- Message d'information SANS directives OWL -->
+                            <div class="alert alert-warning mt-2" role="alert">
+                                <i class="fa fa-info-circle"/>
+                                <strong>Astuce :</strong> Pour une meilleure organisation, sélectionnez de préférence les appartements correspondant aux critères de cette catégorie.
+                            </div>
+
+                            <!-- Vue détaillée des appartements sélectionnés -->
+                            <separator string="Appartements dans cette catégorie" invisible="not room_ids"/>
                             <field name="room_ids"
-                                   context="{'default_is_room_type': True, 'default_bedroom_count': bedroom_count, 'default_is_furnished': is_furnished, 'tree_view_ref': 'hotel_room_availability.view_product_product_tree_room_category'}"/>
+                                   nolabel="1"
+                                   invisible="not room_ids">
+                                <list create="false" delete="true" edit="false" string="Détails">
+                                    <field name="name"/>
+                                    <field name="bedroom_count" optional="show"/>
+                                    <field name="is_furnished" widget="boolean_toggle" optional="show"/>
+                                    <field name="list_price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="max_adult" optional="show"/>
+                                    <field name="max_child" optional="show"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+
+                            <!-- Message d'aide -->
+                            <div class="alert alert-info mt-3" role="alert" invisible="room_ids">
+                                <i class="fa fa-lightbulb-o"/>
+                                <strong>Aucun appartement dans cette catégorie.</strong>
+                                <p class="mb-0">
+                                    Utilisez le champ ci-dessus pour sélectionner des appartements existants.
+                                </p>
+                            </div>
                         </page>
                     </notebook>
                 </sheet>
@@ -103,36 +147,45 @@
                     <t t-name="card">
                         <div class="d-flex flex-column">
                             <div class="d-flex flex-row gap-2">
-                                <div class="o_kanban_image_fill position-relative">
-                                    <img t-att-src="'/web/image/hotel.room.category/' + record.id.raw_value + '/image/90x90'"
-                                         alt="Category"
-                                         class="o_image_64_cover"
-                                         style="width: 64px; height: 64px; object-fit: cover; border-radius: 4px;"/>
+                                <!-- Image avec fallback -->
+                                <div class="o_kanban_image position-relative">
+                                    <t t-if="record.image.raw_value">
+                                        <img t-att-src="'/web/image/hotel.room.category/' + record.id.raw_value + '/image/90x90'"
+                                             alt="Category"
+                                             class="o_image_64_cover rounded"
+                                             style="width: 64px; height: 64px; object-fit: cover;"/>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="bg-secondary d-flex align-items-center justify-content-center rounded"
+                                             style="width: 64px; height: 64px;">
+                                            <i class="fa fa-building fa-2x text-white"/>
+                                        </div>
+                                    </t>
                                 </div>
+
+                                <!-- Contenu -->
                                 <div class="d-flex flex-column gap-1 flex-grow-1">
                                     <div class="d-flex flex-row justify-content-between">
-                                        <div>
-                                            <strong class="o_kanban_record_title">
-                                                <field name="name"/>
-                                            </strong>
-                                        </div>
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
                                     </div>
-                                    <div class="o_kanban_record_subtitle text-muted">
-                                        <field name="bedroom_count"/> chambre(s) -
-                                        <t t-if="record.is_furnished.raw_value">Meublé</t>
-                                        <t t-else="">Non-meublé</t>
+                                    <div class="o_kanban_record_subtitle text-muted small">
+                                        <i class="fa fa-bed"/> <field name="bedroom_count"/> chambre(s) -
+                                        <t t-if="record.is_furnished.raw_value">
+                                            <i class="fa fa-check text-success"/> Meublé
+                                        </t>
+                                        <t t-else="">
+                                            <i class="fa fa-cube text-info"/> Non-meublé
+                                        </t>
                                     </div>
                                     <div class="o_kanban_record_bottom mt-2">
-                                        <div class="oe_kanban_bottom_left">
-                                            <span class="badge rounded-pill text-bg-success me-1">
-                                                <i class="fa fa-check-circle"/>
-                                                <field name="available_rooms"/> disponibles
-                                            </span>
-                                            <span class="badge rounded-pill text-bg-info">
-                                                <i class="fa fa-building"/>
-                                                <field name="total_rooms"/> total
-                                            </span>
-                                        </div>
+                                        <span class="badge rounded-pill text-bg-success me-1">
+                                            <field name="available_rooms"/> disp.
+                                        </span>
+                                        <span class="badge rounded-pill text-bg-info">
+                                            <field name="total_rooms"/> total
+                                        </span>
                                     </div>
                                 </div>
                             </div>

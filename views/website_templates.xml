@@ -1,76 +1,413 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Page des catégories d'appartements -->
+    <!-- ========================================== -->
+    <!-- ASSETS CSS                                  -->
+    <!-- ========================================== -->
+
+    <template id="residence_assets" name="Residence Categories Assets">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" href="/hotel_residence_category/static/src/css/residence_categories.css"/>
+        </xpath>
+    </template>
+
+    <!-- Charger les assets sur toutes les pages du site -->
+    <template id="assets_frontend" inherit_id="website.assets_frontend" name="Residence Categories Frontend Assets">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" href="/hotel_residence_category/static/src/css/residence_categories.css"/>
+        </xpath>
+    </template>
+
+
+    <!-- ========================================== -->
+    <!-- PAGE : LISTE DES CATÉGORIES                -->
+    <!-- ========================================== -->
+
     <template id="residence_categories_page" name="Residence Categories">
         <t t-call="website.layout">
             <div id="wrap" class="oe_structure">
                 <div class="container mt-5 mb-5">
+                    <!-- En-tête -->
                     <div class="row">
-                        <div class="col-lg-12">
-                            <h1 class="text-center mb-4">Nos Appartements</h1>
-                            <p class="text-center text-muted mb-5">
+                        <div class="col-lg-12 text-center mb-5">
+                            <h1 class="display-4 mb-3">Nos Appartements</h1>
+                            <p class="lead text-muted">
                                 Découvrez nos différentes catégories d'appartements disponibles
                             </p>
                         </div>
                     </div>
 
+                    <!-- Grille des catégories -->
                     <div class="row">
                         <t t-foreach="categories" t-as="category">
                             <div class="col-lg-6 col-md-6 mb-4">
-                                <div class="card h-100 shadow-sm">
+                                <div class="card residence-category-card h-100 shadow-sm hover-shadow">
+                                    <!-- Image -->
                                     <t t-if="category.image">
-                                        <img class="card-img-top" t-att-src="image_data_uri(category.image)" alt="Category Image" style="height: 250px; object-fit: cover;"/>
+                                        <img class="card-img-top"
+                                             t-att-src="image_data_uri(category.image)"
+                                             t-att-alt="category.name"
+                                             style="height: 280px; object-fit: cover;"/>
                                     </t>
                                     <t t-else="">
-                                        <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 250px;">
-                                            <i class="fa fa-building fa-5x text-white"/>
+                                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                                             style="height: 280px;">
+                                            <i class="fa fa-building fa-5x text-muted"/>
                                         </div>
                                     </t>
 
-                                    <div class="card-body">
-                                        <h3 class="card-title">
+                                    <!-- Corps de la carte -->
+                                    <div class="card-body d-flex flex-column">
+                                        <h3 class="card-title h4">
                                             <t t-esc="category.name"/>
                                         </h3>
 
+                                        <!-- Badges -->
                                         <div class="mb-3">
-                                            <span class="badge badge-primary mr-2">
+                                            <span class="badge bg-primary me-2">
                                                 <i class="fa fa-bed"/> <t t-esc="category.bedroom_count"/> Chambres
                                             </span>
-                                            <span t-if="category.is_furnished" class="badge badge-success">
-                                                <i class="fa fa-check"/> Meublé
-                                            </span>
-                                            <span t-else="" class="badge badge-info">
-                                                <i class="fa fa-cube"/> Non-meublé
-                                            </span>
+                                            <t t-if="category.is_furnished">
+                                                <span class="badge bg-success">
+                                                    <i class="fa fa-check"/> Meublé
+                                                </span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="badge bg-info">
+                                                    <i class="fa fa-cube"/> Non-meublé
+                                                </span>
+                                            </t>
                                         </div>
 
-                                        <p class="card-text text-muted">
-                                            <t t-esc="category.description"/>
+                                        <!-- Description -->
+                                        <p class="card-text text-muted flex-grow-1">
+                                            <t t-if="category.description">
+                                                <t t-esc="category.description[:150]"/>
+                                                <t t-if="len(category.description) > 150">...</t>
+                                            </t>
+                                            <t t-else="">
+                                                Découvrez nos appartements de cette catégorie.
+                                            </t>
                                         </p>
 
-                                        <div class="alert alert-info mb-3">
-                                            <strong>
-                                                <i class="fa fa-info-circle"/> Disponibilité :
-                                                <span class="text-success">
+                                        <!-- Disponibilité -->
+                                        <div class="alert alert-light border mb-3">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <strong class="text-dark">
+                                                    <i class="fa fa-info-circle text-primary"/> Disponibilité
+                                                </strong>
+                                                <span class="badge bg-success fs-6">
                                                     <t t-esc="category.available_rooms"/>/<t t-esc="category.total_rooms"/>
                                                 </span>
-                                            </strong>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="card-footer bg-transparent">
-                                        <a t-att-href="'/residence/category/%s' % category.id" class="btn btn-primary btn-block">
-                                            <i class="fa fa-eye"/> Voir les appartements disponibles
+                                        <!-- Bouton -->
+                                        <a t-att-href="'/residence/category/%s' % category.id"
+                                           class="btn btn-primary btn-lg w-100 mt-auto">
+                                            <i class="fa fa-eye"/> Voir les appartements
                                         </a>
                                     </div>
                                 </div>
                             </div>
                         </t>
                     </div>
+
+                    <!-- Message si aucune catégorie -->
+                    <t t-if="not categories">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="alert alert-info text-center">
+                                    <h4><i class="fa fa-info-circle"/> Aucune catégorie disponible</h4>
+                                    <p class="mb-0">Les catégories d'appartements seront bientôt disponibles.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
                 </div>
             </div>
         </t>
     </template>
+
+
+    <!-- ========================================== -->
+    <!-- PAGE : DÉTAIL D'UNE CATÉGORIE             -->
+    <!-- ========================================== -->
+
+    <template id="residence_category_detail_page" name="Residence Category Detail">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure">
+                <div class="container mt-5 mb-5">
+                    <!-- Breadcrumb -->
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="/">Accueil</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="/residence/categories">Catégories</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                <t t-esc="category.name"/>
+                            </li>
+                        </ol>
+                    </nav>
+
+                    <!-- En-tête de la catégorie -->
+                    <div class="row mb-5">
+                        <div class="col-lg-8">
+                            <h1 class="display-5 mb-3">
+                                <t t-esc="category.name"/>
+                            </h1>
+
+                            <!-- Badges -->
+                            <div class="mb-3">
+                                <span class="badge bg-primary me-2 fs-6">
+                                    <i class="fa fa-bed"/> <t t-esc="category.bedroom_count"/> Chambres
+                                </span>
+                                <t t-if="category.is_furnished">
+                                    <span class="badge bg-success fs-6">
+                                        <i class="fa fa-check"/> Meublé
+                                    </span>
+                                </t>
+                                <t t-else="">
+                                    <span class="badge bg-info fs-6">
+                                        <i class="fa fa-cube"/> Non-meublé
+                                    </span>
+                                </t>
+                            </div>
+
+                            <!-- Description -->
+                            <t t-if="category.description">
+                                <p class="lead text-muted">
+                                    <t t-esc="category.description"/>
+                                </p>
+                            </t>
+                        </div>
+
+                        <!-- Card de disponibilité -->
+                        <div class="col-lg-4">
+                            <div class="card border-primary">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fa fa-info-circle"/> Disponibilité
+                                    </h5>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="display-4 mb-2">
+                                        <span class="text-success fw-bold">
+                                            <t t-esc="category.available_rooms"/>
+                                        </span>
+                                        <span class="text-muted">/<t t-esc="category.total_rooms"/></span>
+                                    </div>
+                                    <p class="text-muted mb-0">
+                                        appartements disponibles
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Liste des appartements -->
+                    <h2 class="mb-4">
+                        <i class="fa fa-building"/> Appartements disponibles
+                    </h2>
+
+                    <t t-if="rooms">
+                        <div class="row">
+                            <t t-foreach="rooms" t-as="room">
+                                <div class="col-lg-4 col-md-6 mb-4">
+                                    <div class="card h-100 shadow-sm hover-shadow">
+                                        <!-- Image -->
+                                        <t t-if="room.image_1920">
+                                            <img class="card-img-top"
+                                                 t-att-src="image_data_uri(room.image_1920)"
+                                                 t-att-alt="room.name"
+                                                 style="height: 200px; object-fit: cover;"/>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                                                 style="height: 200px;">
+                                                <i class="fa fa-home fa-4x text-muted"/>
+                                            </div>
+                                        </t>
+
+                                        <!-- Corps -->
+                                        <div class="card-body">
+                                            <h5 class="card-title">
+                                                <t t-esc="room.name"/>
+                                            </h5>
+
+                                            <!-- Capacité -->
+                                            <div class="mb-3">
+                                                <small class="text-muted">
+                                                    <i class="fa fa-users"/>
+                                                    <t t-esc="room.max_adult"/> adultes,
+                                                    <t t-esc="room.max_child"/> enfants
+                                                </small>
+                                            </div>
+
+                                            <!-- Prix -->
+                                            <div class="mb-3">
+                                                <h4 class="text-primary mb-0">
+                                                    <t t-esc="room.list_price" t-options="{'widget': 'monetary', 'display_currency': room.currency_id}"/>
+                                                    <small class="text-muted fs-6">/ nuit</small>
+                                                </h4>
+                                            </div>
+
+                                            <!-- Badge disponibilité -->
+                                            <t t-if="room.is_available_today">
+                                                <span class="badge bg-success w-100 p-2">
+                                                    <i class="fa fa-check-circle"/> Disponible
+                                                </span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="badge bg-danger w-100 p-2">
+                                                    <i class="fa fa-times-circle"/> Occupé
+                                                </span>
+                                            </t>
+                                        </div>
+
+                                        <!-- Footer -->
+                                        <div class="card-footer bg-transparent">
+                                            <a t-att-href="'/shop/product/%s' % room.id"
+                                               class="btn btn-outline-primary w-100">
+                                                <i class="fa fa-info-circle"/> Voir détails
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+
+                    <!-- Message si aucun appartement -->
+                    <t t-if="not rooms">
+                        <div class="alert alert-warning">
+                            <h5><i class="fa fa-exclamation-triangle"/> Aucun appartement disponible</h5>
+                            <p class="mb-0">Il n'y a actuellement aucun appartement dans cette catégorie.</p>
+                        </div>
+                    </t>
+
+                    <!-- Bouton retour -->
+                    <div class="row mt-5">
+                        <div class="col-12 text-center">
+                            <a href="/residence/categories" class="btn btn-secondary btn-lg">
+                                <i class="fa fa-arrow-left"/> Retour aux catégories
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+
+    <!-- ========================================== -->
+    <!-- SNIPPET : CATÉGORIES POUR LE BUILDER       -->
+    <!-- ========================================== -->
+
+    <template id="residence_categories_snippet" name="Residence Categories Snippet">
+        <section class="s_residence_categories pt-5 pb-5">
+            <div class="container">
+                <!-- En-tête -->
+                <div class="row mb-4">
+                    <div class="col-lg-12 text-center">
+                        <h2 class="h1 mb-3">Nos Catégories d'Appartements</h2>
+                        <p class="lead text-muted">
+                            Choisissez parmi nos différentes options de logement
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Grille 4 colonnes -->
+                <div class="row">
+                    <t t-set="categories" t-value="request.env['hotel.room.category'].sudo().search([('active', '=', True)], limit=4, order='sequence')"/>
+
+                    <t t-foreach="categories" t-as="category">
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card h-100 shadow-sm hover-shadow text-center">
+                                <!-- Image -->
+                                <t t-if="category.image">
+                                    <img class="card-img-top"
+                                         t-att-src="image_data_uri(category.image)"
+                                         t-att-alt="category.name"
+                                         style="height: 200px; object-fit: cover;"/>
+                                </t>
+                                <t t-else="">
+                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                                         style="height: 200px;">
+                                        <i class="fa fa-building fa-4x text-muted"/>
+                                    </div>
+                                </t>
+
+                                <!-- Corps -->
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <t t-esc="category.name"/>
+                                    </h5>
+
+                                    <!-- Badges -->
+                                    <div class="mb-3">
+                                        <span class="badge bg-primary">
+                                            <i class="fa fa-bed"/> <t t-esc="category.bedroom_count"/> CH
+                                        </span>
+                                        <t t-if="category.is_furnished">
+                                            <span class="badge bg-success">Meublé</span>
+                                        </t>
+                                    </div>
+
+                                    <!-- Disponibilité -->
+                                    <p class="mb-3">
+                                        <strong class="text-success">
+                                            <t t-esc="category.available_rooms"/>/<t t-esc="category.total_rooms"/>
+                                        </strong>
+                                        <small class="text-muted d-block">disponibles</small>
+                                    </p>
+
+                                    <!-- Bouton -->
+                                    <a t-att-href="'/residence/category/%s' % category.id"
+                                       class="btn btn-primary w-100">
+                                        Voir <i class="fa fa-arrow-right"/>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+
+                <!-- Lien vers toutes les catégories -->
+                <div class="row mt-4">
+                    <div class="col-12 text-center">
+                        <a href="/residence/categories" class="btn btn-outline-primary btn-lg">
+                            Voir toutes les catégories <i class="fa fa-arrow-right"/>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </template>
+
+    <!-- Enregistrer le snippet dans le constructeur de site -->
+    <record id="residence_categories_snippet_option" model="ir.ui.view">
+        <field name="name">Residence Categories Snippet Option</field>
+        <field name="key">hotel_residence_category.residence_categories_snippet</field>
+        <field name="type">qweb</field>
+        <field name="mode">extension</field>
+        <field name="inherit_id" ref="website.snippets"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='snippet_structure']" position="inside">
+                <div>
+                    <div class="oe_snippet_thumbnail">
+                        <i class="fa fa-building"/>
+                        <span class="oe_snippet_thumbnail_title">Catégories Appartements</span>
+                    </div>
+                    <section class="oe_snippet_body s_residence_categories">
+                        <t t-call="hotel_residence_category.residence_categories_snippet"/>
+                    </section>
+                </div>
+            </xpath>
+        </field>
+    </record>
 
 </odoo>
