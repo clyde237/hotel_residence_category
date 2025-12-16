@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+    =====================================================
+    SNIPPETS POUR LE CONSTRUCTEUR DE SITE
+    =====================================================
+
+    Pour utiliser le snippet dans une page :
+    1. Créez une nouvelle page ou éditez une page existante
+    2. Passez en mode "Édition"
+    3. Cliquez sur "</> Insérer du code" ou ajoutez un bloc HTML
+    4. Copiez-collez ce code :
+
+    <section class="s_residence_categories pt-5 pb-5">
+        <t t-call="hotel_residence_category.residence_categories_snippet"/>
+    </section>
+
+    OU ajoutez directement via le constructeur :
+    - Bloc Structure > HTML personnalisé
+    - Collez le template
+    =====================================================
+    -->
+
+    <!-- Template de snippet simple à copier-coller -->
+    <template id="residence_snippet_simple" name="Residence Categories (Simple)">
+        <section class="s_residence_categories pt-5 pb-5 bg-light">
+            <div class="container">
+                <div class="row mb-4">
+                    <div class="col-lg-12 text-center">
+                        <h2 class="h1 mb-3">Nos Catégories d'Appartements</h2>
+                        <p class="lead text-muted">Choisissez parmi nos différentes options de logement</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <t t-set="categories" t-value="request.env['hotel.room.category'].sudo().search([('active', '=', True)], limit=4, order='sequence')"/>
+
+                    <t t-foreach="categories" t-as="category">
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card h-100 shadow-sm text-center">
+                                <t t-if="category.image">
+                                    <img class="card-img-top"
+                                         t-att-src="image_data_uri(category.image)"
+                                         t-att-alt="category.name"
+                                         style="height: 200px; object-fit: cover;"/>
+                                </t>
+                                <t t-else="">
+                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                                         style="height: 200px;">
+                                        <i class="fa fa-building fa-4x text-muted"/>
+                                    </div>
+                                </t>
+
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <t t-esc="category.name"/>
+                                    </h5>
+
+                                    <div class="mb-3">
+                                        <span class="badge bg-primary">
+                                            <i class="fa fa-bed"/> <t t-esc="category.bedroom_count"/> CH
+                                        </span>
+                                        <t t-if="category.is_furnished">
+                                            <span class="badge bg-success">Meublé</span>
+                                        </t>
+                                    </div>
+
+                                    <p class="mb-3">
+                                        <strong class="text-success">
+                                            <t t-esc="category.available_rooms"/>/<t t-esc="category.total_rooms"/>
+                                        </strong>
+                                        <small class="text-muted d-block">disponibles</small>
+                                    </p>
+
+                                    <a t-att-href="'/residence/category/%s' % category.id"
+                                       class="btn btn-primary w-100">
+                                        Voir <i class="fa fa-arrow-right"/>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12 text-center">
+                        <a href="/residence/categories" class="btn btn-outline-primary btn-lg">
+                            Voir toutes les catégories <i class="fa fa-arrow-right"/>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </template>
+
+    <!-- Page dédiée au snippet (pour faciliter l'intégration) -->
+    <template id="residence_snippet_page" name="Residence Snippet Demo Page">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <t t-call="hotel_residence_category.residence_snippet_simple"/>
+            </div>
+        </t>
+    </template>
+
+</odoo>

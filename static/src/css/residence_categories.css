@@ -1,0 +1,133 @@
+/* ============================================ */
+/* RESIDENCE CATEGORIES STYLES                  */
+/* ============================================ */
+
+/* Effet hover sur les cartes */
+.residence-category-card {
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.residence-category-card:hover,
+.hover-shadow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Badge personnalisé */
+.badge {
+    padding: 0.5em 0.75em;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Images des cartes */
+.card-img-top {
+    transition: transform 0.3s ease;
+}
+
+.residence-category-card:hover .card-img-top {
+    transform: scale(1.05);
+    overflow: hidden;
+}
+
+/* Boutons */
+.btn-primary {
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Card footer transparent */
+.card-footer.bg-transparent {
+    background-color: transparent !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Section snippet */
+.s_residence_categories {
+    background-color: #f8f9fa;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .residence-category-card {
+        margin-bottom: 1.5rem;
+    }
+
+    .display-4 {
+        font-size: 2.5rem;
+    }
+
+    .display-5 {
+        font-size: 2rem;
+    }
+}
+
+/* Animation de chargement pour les images */
+.card-img-top {
+    background-color: #f0f0f0;
+}
+
+/* Style pour les alertes */
+.alert {
+    border-radius: 0.5rem;
+}
+
+/* Breadcrumb personnalisé */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0.75rem 0;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+    font-size: 1.2em;
+}
+
+/* Card de disponibilité */
+.border-primary {
+    border-width: 2px !important;
+}
+
+/* Amélioration des icônes Font Awesome */
+.fa {
+    margin-right: 0.25rem;
+}
+
+/* Style pour le snippet dans le builder */
+.oe_snippet_thumbnail {
+    text-align: center;
+    padding: 1rem;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    cursor: move;
+}
+
+.oe_snippet_thumbnail i {
+    font-size: 2rem;
+    color: #0d6efd;
+    margin-bottom: 0.5rem;
+}
+
+.oe_snippet_thumbnail_title {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #495057;
+}
+
+/* Hover effect pour les cartes dans le snippet */
+.s_residence_categories .card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.s_residence_categories .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+}

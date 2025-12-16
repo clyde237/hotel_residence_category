@@ -24,7 +24,14 @@
     'data/room_categories_data.xml',
     'views/room_category_views.xml',
     'views/website_templates.xml',  # ✅ Déjà présent
+    'views/snippets.xml',
     ],
+    'assets': {
+        'web.assets_frontend': [
+            'hotel_residence_category/static/src/css/residence_categories.css',
+            #'hotel_residence_category/static/src/js/residence_categories.js',
+        ],
+    },
     'installable': True,
     'application': False,
     'auto_install': False,

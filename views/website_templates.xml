@@ -2,24 +2,6 @@
 <odoo>
 
     <!-- ========================================== -->
-    <!-- ASSETS CSS                                  -->
-    <!-- ========================================== -->
-
-    <template id="residence_assets" name="Residence Categories Assets">
-        <xpath expr="." position="inside">
-            <link rel="stylesheet" href="/hotel_residence_category/static/src/css/residence_categories.css"/>
-        </xpath>
-    </template>
-
-    <!-- Charger les assets sur toutes les pages du site -->
-    <template id="assets_frontend" inherit_id="website.assets_frontend" name="Residence Categories Frontend Assets">
-        <xpath expr="." position="inside">
-            <link rel="stylesheet" href="/hotel_residence_category/static/src/css/residence_categories.css"/>
-        </xpath>
-    </template>
-
-
-    <!-- ========================================== -->
     <!-- PAGE : LISTE DES CATÉGORIES                -->
     <!-- ========================================== -->
 
@@ -387,27 +369,5 @@
             </div>
         </section>
     </template>
-
-    <!-- Enregistrer le snippet dans le constructeur de site -->
-    <record id="residence_categories_snippet_option" model="ir.ui.view">
-        <field name="name">Residence Categories Snippet Option</field>
-        <field name="key">hotel_residence_category.residence_categories_snippet</field>
-        <field name="type">qweb</field>
-        <field name="mode">extension</field>
-        <field name="inherit_id" ref="website.snippets"/>
-        <field name="arch" type="xml">
-            <xpath expr="//div[@id='snippet_structure']" position="inside">
-                <div>
-                    <div class="oe_snippet_thumbnail">
-                        <i class="fa fa-building"/>
-                        <span class="oe_snippet_thumbnail_title">Catégories Appartements</span>
-                    </div>
-                    <section class="oe_snippet_body s_residence_categories">
-                        <t t-call="hotel_residence_category.residence_categories_snippet"/>
-                    </section>
-                </div>
-            </xpath>
-        </field>
-    </record>
 
 </odoo>
