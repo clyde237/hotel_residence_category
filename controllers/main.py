@@ -2,6 +2,7 @@
 
 from odoo import http, fields
 from odoo.http import request
+import random
 
 
 class ResidenceCategoriesController(http.Controller):
@@ -24,9 +25,12 @@ class ResidenceCategoriesController(http.Controller):
 
         return request.render('hotel_residence_category.residence_categories_page', values)
 
-    @http.route(['/residence/category/<int:category_id>'], type='http', auth='public', website=True, sitemap=True)
-    def residence_category_detail(self, category_id, **kwargs):
-        """Page de détail d'une catégorie avec ses appartements"""
+    @http.route(['/residence/category/<int:category_id>/book'], type='http', auth='public', website=True)
+    def reserve_random_room(self, category_id, **kwargs):
+        """
+        Réserve un appartement aléatoire disponible dans la catégorie
+        Redirige vers la page de réservation de l'appartement choisi
+        """
 
         Category = request.env['hotel.room.category']
         category = Category.sudo().browse(category_id)
@@ -35,16 +39,25 @@ class ResidenceCategoriesController(http.Controller):
         if not category.exists() or not category.active:
             return request.redirect('/residence/categories')
 
-        # Récupérer les appartements de cette catégorie
-        rooms = category.room_ids.filtered(lambda r: r.active)
+        # Récupérer les appartements disponibles de cette catégorie
+        available_rooms = category.room_ids.filtered(
+            lambda r: r.active and r.is_available_today
+        )
 
-        values = {
-            'category': category,
-            'rooms': rooms,
-            'page_name': 'residence_category_detail',
-        }
+        # Si aucun appartement disponible, rediriger avec message
+        if not available_rooms:
+            # Rediriger vers la page des catégories avec un message d'erreur
+            return request.redirect('/residence/categories?error=no_availability')
 
-        return request.render('hotel_residence_category.residence_category_detail_page', values)
+        # Choisir un appartement aléatoire parmi les disponibles
+        selected_room = random.choice(available_rooms)
+
+        # Rediriger vers la page de réservation/produit de l'appartement
+        # Option 1 : Vers la page produit e-commerce
+        return request.redirect(f'/shop/product/{selected_room.id}')
+
+        # Option 2 : Si vous voulez créer une réservation directement
+        # return request.redirect(f'/shop/cart/update?product_id={selected_room.id}&add_qty=1')
 
     @http.route(['/residence/category/<int:category_id>/availability'],
                 type='json', auth='public', website=True)
@@ -57,14 +70,16 @@ class ResidenceCategoriesController(http.Controller):
         if not category.exists():
             return {'error': 'Category not found'}
 
-        # Si des dates sont fournies, on pourrait calculer la disponibilité pour ces dates
-        # Pour l'instant, on retourne juste les stats actuelles
+        # Calculer les appartements disponibles
+        available_rooms = category.room_ids.filtered(
+            lambda r: r.active and r.is_available_today
+        )
 
         return {
             'category_id': category.id,
             'category_name': category.name,
             'total_rooms': category.total_rooms,
-            'available_rooms': category.available_rooms,
+            'available_rooms': len(available_rooms),
             'availability_percentage': (
-                        category.available_rooms / category.total_rooms * 100) if category.total_rooms > 0 else 0,
+                        len(available_rooms) / category.total_rooms * 100) if category.total_rooms > 0 else 0,
         }
