@@ -6,7 +6,7 @@ from odoo import models, fields, api
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
-    category_id = fields.Many2one(
+    room_category_id = fields.Many2one(
         'hotel.room.category',
         string='Catégorie',
         ondelete='restrict',
@@ -23,6 +23,12 @@ class ProductProduct(models.Model):
         default=False
     )
 
+    is_hotel_room = fields.Boolean(
+        string='Est une chambre d\'hôtel',
+        default=False,
+        help='Cocher si ce produit est une chambre d\'hôtel'
+    )
+
     @api.onchange('bedroom_count', 'is_furnished')
     def _onchange_auto_assign_category(self):
         """Assigne automatiquement la catégorie selon le nombre de chambres et meublé/non-meublé"""
@@ -33,7 +39,7 @@ class ProductProduct(models.Model):
             ], limit=1)
 
             if category:
-                self.category_id = category.id
+                self.room_category_id = category.id
 
     def is_available(self, checkin_date=None, checkout_date=None):
         """

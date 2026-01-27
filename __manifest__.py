@@ -32,6 +32,8 @@
             #'hotel_residence_category/static/src/js/residence_categories.js',
         ],
     },
+    'demo': [],
+    'images': ['static/description/banner.png'],
     'installable': True,
     'application': False,
     'auto_install': False,

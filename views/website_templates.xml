@@ -2,7 +2,7 @@
 <odoo>
 
     <!-- ========================================== -->
-    <!-- PAGE : LISTE DES CATÉGORIES                -->
+    <!-- PAGE : LISTE DES CATÉGORIES AVEC CAROUSEL  -->
     <!-- ========================================== -->
 
     <template id="residence_categories_page" name="Residence Categories">
@@ -38,19 +38,84 @@
                         <t t-foreach="categories" t-as="category">
                             <div class="col-lg-6 col-md-6 mb-4">
                                 <div class="card residence-category-card h-100 shadow-sm">
-                                    <!-- Image -->
+
+                                    <!-- CAROUSEL D'IMAGES -->
+                                    <t t-set="has_gallery" t-value="len(category.image_ids.filtered(lambda img: img.active)) > 0"/>
+                                    <t t-set="carousel_id" t-value="'carousel_%s' % category.id"/>
+
                                     <div class="card-img-wrapper">
-                                        <t t-if="category.image">
-                                            <img class="card-img-top"
-                                                 t-att-src="image_data_uri(category.image)"
-                                                 t-att-alt="category.name"
-                                                 style="height: 300px; object-fit: cover;"/>
-                                        </t>
-                                        <t t-else="">
-                                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
-                                                 style="height: 300px;">
-                                                <i class="fa fa-building fa-5x text-muted"/>
+                                        <t t-if="has_gallery">
+                                            <!-- Carousel Bootstrap avec plusieurs images -->
+                                            <div t-att-id="carousel_id" class="carousel slide" data-bs-ride="carousel">
+                                                <!-- Indicateurs -->
+                                                <div class="carousel-indicators">
+                                                    <t t-set="active_images" t-value="category.image_ids.filtered(lambda img: img.active)"/>
+                                                    <t t-foreach="active_images" t-as="img">
+                                                        <button type="button"
+                                                                t-att-data-bs-target="'#%s' % carousel_id"
+                                                                t-att-data-bs-slide-to="img_index"
+                                                                t-att-class="'active' if img_index == 0 else ''"
+                                                                t-att-aria-current="'true' if img_index == 0 else 'false'"
+                                                                t-att-aria-label="'Slide %s' % (img_index + 1)"/>
+                                                    </t>
+                                                </div>
+
+                                                <!-- Images -->
+                                                <div class="carousel-inner">
+                                                    <t t-foreach="active_images" t-as="img">
+                                                        <div t-att-class="'carousel-item' + (' active' if img_index == 0 else '')">
+                                                            <img class="d-block w-100"
+                                                                 t-att-src="image_data_uri(img.image)"
+                                                                 t-att-alt="img.name or category.name"
+                                                                 style="height: 300px; object-fit: cover;"/>
+                                                            <t t-if="img.name">
+                                                                <div class="carousel-caption d-none d-md-block">
+                                                                    <p class="mb-0 bg-dark bg-opacity-50 px-3 py-1 rounded">
+                                                                        <t t-esc="img.name"/>
+                                                                    </p>
+                                                                </div>
+                                                            </t>
+                                                        </div>
+                                                    </t>
+                                                </div>
+
+                                                <!-- Contrôles -->
+                                                <button class="carousel-control-prev" type="button"
+                                                        t-att-data-bs-target="'#%s' % carousel_id"
+                                                        data-bs-slide="prev">
+                                                    <span class="carousel-control-prev-icon" aria-hidden="true"/>
+                                                    <span class="visually-hidden">Précédent</span>
+                                                </button>
+                                                <button class="carousel-control-next" type="button"
+                                                        t-att-data-bs-target="'#%s' % carousel_id"
+                                                        data-bs-slide="next">
+                                                    <span class="carousel-control-next-icon" aria-hidden="true"/>
+                                                    <span class="visually-hidden">Suivant</span>
+                                                </button>
+
+                                                <!-- Badge nombre d'images -->
+                                                <div class="image-count-badge">
+                                                    <span class="badge bg-dark bg-opacity-75">
+                                                        <i class="fa fa-images"/> <t t-esc="len(active_images)"/>
+                                                    </span>
+                                                </div>
                                             </div>
+                                        </t>
+
+                                        <!-- Fallback : Image principale ou placeholder -->
+                                        <t t-else="">
+                                            <t t-if="category.image">
+                                                <img class="card-img-top"
+                                                     t-att-src="image_data_uri(category.image)"
+                                                     t-att-alt="category.name"
+                                                     style="height: 300px; object-fit: cover;"/>
+                                            </t>
+                                            <t t-else="">
+                                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                                                     style="height: 300px;">
+                                                    <i class="fa fa-building fa-5x text-muted"/>
+                                                </div>
+                                            </t>
                                         </t>
 
                                         <!-- Badge de disponibilité en overlay -->
@@ -183,7 +248,7 @@
 
 
     <!-- ========================================== -->
-    <!-- SNIPPET : CATÉGORIES POUR LE BUILDER       -->
+    <!-- SNIPPET : CATÉGORIES AVEC CAROUSEL         -->
     <!-- ========================================== -->
 
     <template id="residence_categories_snippet" name="Residence Categories Snippet">
@@ -199,26 +264,54 @@
                     </div>
                 </div>
 
-                <!-- Grille 4 colonnes -->
+                <!-- Grille 4 colonnes avec mini-carousel -->
                 <div class="row">
                     <t t-set="categories" t-value="request.env['hotel.room.category'].sudo().search([('active', '=', True)], limit=4, order='sequence')"/>
 
                     <t t-foreach="categories" t-as="category">
                         <div class="col-lg-3 col-md-6 mb-4">
                             <div class="card h-100 shadow-sm text-center residence-snippet-card">
-                                <!-- Image -->
+
+                                <!-- Mini-carousel pour snippet -->
+                                <t t-set="has_gallery" t-value="len(category.image_ids.filtered(lambda img: img.active)) > 0"/>
+                                <t t-set="carousel_id_snippet" t-value="'carousel_snippet_%s' % category.id"/>
+
                                 <div class="card-img-wrapper">
-                                    <t t-if="category.image">
-                                        <img class="card-img-top"
-                                             t-att-src="image_data_uri(category.image)"
-                                             t-att-alt="category.name"
-                                             style="height: 220px; object-fit: cover;"/>
+                                    <t t-if="has_gallery">
+                                        <div t-att-id="carousel_id_snippet" class="carousel slide" data-bs-ride="carousel">
+                                            <div class="carousel-inner">
+                                                <t t-set="active_images" t-value="category.image_ids.filtered(lambda img: img.active)"/>
+                                                <t t-foreach="active_images" t-as="img">
+                                                    <div t-att-class="'carousel-item' + (' active' if img_index == 0 else '')">
+                                                        <img class="d-block w-100"
+                                                             t-att-src="image_data_uri(img.image)"
+                                                             t-att-alt="category.name"
+                                                             style="height: 220px; object-fit: cover;"/>
+                                                    </div>
+                                                </t>
+                                            </div>
+
+                                            <!-- Badge nombre d'images (petite version) -->
+                                            <div class="image-count-badge-snippet">
+                                                <span class="badge bg-dark bg-opacity-75">
+                                                    <i class="fa fa-images"/> <t t-esc="len(active_images)"/>
+                                                </span>
+                                            </div>
+                                        </div>
                                     </t>
                                     <t t-else="">
-                                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
-                                             style="height: 220px;">
-                                            <i class="fa fa-building fa-4x text-muted"/>
-                                        </div>
+                                        <t t-if="category.image">
+                                            <img class="card-img-top"
+                                                 t-att-src="image_data_uri(category.image)"
+                                                 t-att-alt="category.name"
+                                                 style="height: 220px; object-fit: cover;"/>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                                                 style="height: 220px;">
+                                                <i class="fa fa-building fa-4x text-muted"/>
+                                            </div>
+                                        </t>
                                     </t>
 
                                     <!-- Badge disponibilité -->
